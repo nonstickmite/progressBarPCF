@@ -7,12 +7,10 @@ export class progressBar implements ComponentFramework.StandardControl<IInputs, 
     
     private funcNotifyOutputChanged: () => void;
 
-    private progressAnimation: () => void;
     private progressIncrement: () => void;
 
     private progressNum: number;
     private progressMax: number;
-
 
     /**
      * Empty constructor.
