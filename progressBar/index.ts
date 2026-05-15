@@ -4,7 +4,7 @@ export class progressBar implements ComponentFramework.StandardControl<IInputs, 
     private mainContainer: HTMLDivElement;
     private progressLabel: HTMLLabelElement;
     private progressBar: HTMLProgressElement;
-    
+
     private funcNotifyOutputChanged: () => void;
 
     private progressIncrement: () => void;
@@ -35,13 +35,16 @@ export class progressBar implements ComponentFramework.StandardControl<IInputs, 
     ): void {
         // Add control initialization code
         const _value: number = context.parameters.progress.raw || 0;
-        
+
         this.funcNotifyOutputChanged = notifyOutputChanged;
 
         this.mainContainer = document.createElement("div");
         this.progressBar = document.createElement("progress");
         this.progressLabel = document.createElement("label");
-        
+
+        // mainContainerのidを設定
+        this.mainContainer.id = "mainContainer";
+
         // progressLabelの初期値を設定
         this.progressLabel.innerText = "0";
         this.progressLabel.id = "p-label";
@@ -49,7 +52,7 @@ export class progressBar implements ComponentFramework.StandardControl<IInputs, 
         this.progressBar.value = 0;
         this.progressBar.max = 100;
         this.progressBar.id = "p-bar";
-        
+
         // mainContainerに追加
         this.mainContainer.appendChild(this.progressLabel);
         this.mainContainer.appendChild(this.progressBar);
@@ -58,20 +61,34 @@ export class progressBar implements ComponentFramework.StandardControl<IInputs, 
 
 
         // プログレスバーの値の増加の関数を代入
-        this.progressIncrement = async() => {
-            if(_value <= 100 && _value >= 0)
-            {
+        this.progressIncrement = async () => {
+            if (_value <= 100 && _value >= 0) {
                 this.progressMax = Math.ceil(_value);
-                for(let i = 0; i <= this.progressMax; i++) {
+                for (let i = 0; i <= this.progressMax; i++) {
                     this.progressBar.value = i;
                     this.progressLabel.innerHTML = i.toString() + "%";
+                    // バーに動きを見せるためループ毎に0.01秒待機
                     await sleep(0.01);
                 }
+                this.progressLabel.style.color = "#000000";
+                
+            }
+            else if (_value < 0)
+            {
+                this.progressBar.value = 0;
+                this.progressLabel.innerHTML = "0%↓";
+                this.progressLabel.style.color = "#0000DD";
+                return
+            }
+            else if (_value > 100)
+            {
+                this.progressBar.value = 100;
+                this.progressLabel.innerHTML = _value + "%";
+                this.progressLabel.style.color = "#FF0000";
+                return
             }
             else
             {
-                this.progressBar.value = 0;
-                this.progressLabel.innerHTML = "0%"
                 return
             }
         };
@@ -97,21 +114,37 @@ export class progressBar implements ComponentFramework.StandardControl<IInputs, 
         // Add code to update control view
         const _value: number = context.parameters.progress.raw || 0;
         const sleep = (time: number) => new Promise((resolve) => setTimeout(resolve, time));//timeはミリ秒
-    
-        this.progressIncrement = async() => {
-            if(_value <= 100 && _value >= 0)
-            {
+
+        this.progressIncrement = async () => {
+            if (_value <= 100 && _value >= 0) {
                 this.progressMax = Math.ceil(_value);
-                for(let i = 0; i <= this.progressMax; i++) {
+                for (let i = 0; i <= this.progressMax; i++) {
                     this.progressBar.value = i;
                     this.progressLabel.innerHTML = i.toString() + "%";
                     await sleep(0.01);
                 }
+                this.progressLabel.style.color = "#000000";
+            }
+            else if (_value < 0)
+            {
+                this.progressBar.value = 0;
+                this.progressLabel.innerHTML = "0%↓";
+                this.progressLabel.style.color = "#0000DD";
+                return
+            }
+            else if (_value > 100)
+            {
+                this.progressMax = 100;
+                for (let i = 0; i <= this.progressMax; i++) {
+                    this.progressBar.value = i;
+                    this.progressLabel.innerHTML = i.toString() + "%";
+                    await sleep(0.01);
+                }
+                this.progressLabel.innerHTML = "100%↑";
+                this.progressLabel.style.color = "#CC0000";
             }
             else
             {
-                this.progressBar.value = 0;
-                this.progressLabel.innerHTML = "0%"
                 return
             }
         };
@@ -124,7 +157,7 @@ export class progressBar implements ComponentFramework.StandardControl<IInputs, 
      */
     public getOutputs(): IOutputs {
         return {
-            progress: this.progressBar.value 
+            progress: this.progressBar.value
         };
     }
 
