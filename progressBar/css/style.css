@@ -1,3 +1,13 @@
-label {
-    margin-right: 10px
+#mainContainer {
+    display: flex;
+    flex-direction: column;
+    align-content: flex-start;
+}
+
+#p-bar {
+    width: auto;
+}
+
+#p-label {
+    align-self: flex-end;
 }
